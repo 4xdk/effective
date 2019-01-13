@@ -85,6 +85,7 @@ class TaskDetails extends Component {
             <TaskIcons
               gid={task.gid}
               subtaskGids={task.subtask_gids}
+              creatingHypothesisGroup={task.creatingHypothesisGroup ? task.creatingHypothesisGroup : false}
             />
             <div className="pursuance-title-ctn">
               <span className="pursuance-title">

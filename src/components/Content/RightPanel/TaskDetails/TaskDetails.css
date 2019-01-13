@@ -104,6 +104,14 @@
   min-height: 64px;
 }
 
+.task-deliverables-ctn ul {
+  padding-left: 10px;
+}
+
+.task-deliverables-ctn li {
+  font-size: 16px;
+}
+
 .task-deliverables-ctn a {
   color: #50b3fe;
 }

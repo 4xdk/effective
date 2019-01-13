@@ -1,16 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip, Modal } from 'react-bootstrap';
 import MdArchive from 'react-icons/lib/md/archive';
 import FaCommentsO from 'react-icons/lib/fa/comments-o';
 import FaVideoCamera from 'react-icons/lib/fa/video-camera';
 import './TaskIcons.css';
-import { archiveTask } from '../../../../../actions';
+import { 
+  archiveTask, 
+  fetchHypothesisGroup,
+  toggleHypothesisModal,
+} from '../../../../../actions';
 
 const jitsiRoom = 'https://meet.jit.si/PonchoSpiderPageantFoxAlsoLaptopTractorWoundDebrisCaucasianGrapeDishclothFaucetBuddhistRefineryRibbonIridescentWishboneDesktopMugshotLeukemiaOfficeApricotEuthanizeUngloved';
 
-const TaskIcons = ({ gid, subtaskGids = [], archiveTask, history, currentPursuanceId }) => {
+const TaskIcons = ({ gid, subtaskGids = [], archiveTask, history, currentPursuanceId, creatingHypothesisGroup, toggleHypothesisModal, fetchHypothesisGroup, hypothesis }) => {
 
   const archiveThisTask = () => {
     archiveTask({gid});
@@ -23,6 +27,36 @@ const TaskIcons = ({ gid, subtaskGids = [], archiveTask, history, currentPursuan
   const redirectToDiscuss = () => {
     history.push({
       pathname: `/pursuance/${currentPursuanceId}/discuss/task/${gid}`
+    });
+  }
+
+  const showHypothesisModal = () => {
+    toggleHypothesisModal({taskGid: gid});
+  }
+
+  const hideHypothesisModal = () => {
+    toggleHypothesisModal({taskGid: ''});
+  }
+
+  const setName = (e) => {
+    this.hypName = e.target.value;
+  }
+
+  const setDescription = (e) => {
+    this.hypDescription = e.target.value;
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!this.hypName) {
+      return;
+    }
+
+    fetchHypothesisGroup({
+      taskGid: gid,
+      name: this.hypName,
+      description: this.hypDescription,
     });
   }
 
@@ -79,9 +113,69 @@ const TaskIcons = ({ gid, subtaskGids = [], archiveTask, history, currentPursuan
         </a>
       </OverlayTrigger>
 
-      <OverlayTrigger placement="bottom" overlay={getTooltip('hypothesis')}>
-        <img src="/assets/img/HypothesisLogo.png" alt="Hypothes.is" className="hyp-logo"/>
-      </OverlayTrigger>
+      {creatingHypothesisGroup !== 'done' &&
+        <div>
+          <OverlayTrigger placement="bottom" overlay={getTooltip('hypothesis')}>
+            <img
+              src="/assets/img/HypothesisLogo.png"
+              alt="Hypothes.is"
+              className="hyp-logo"
+              onClick={showHypothesisModal}
+            />
+          </OverlayTrigger>
+
+          <Modal show={!!hypothesis.taskGid} onHide={hideHypothesisModal} className={creatingHypothesisGroup === 'in progress' ? 'busy' : ''}>
+            <Modal.Header closeButton>
+              Create Hypothesis Group
+            </Modal.Header>
+
+            <Modal.Body>
+              <form className="hypgroup-form form-horizontal" name={'modal-' + gid}>
+                <div id="input-hypgroup-name-ctn" className="">
+                  <div className="form-group">
+                    <label className="col-sm-2 control-label" htmlFor="input-hypgroup-name">Name*</label>
+                    <div className="col-sm-10">
+                      <input
+                        id="input-hypgroup-name"
+                        type="text"
+                        className="form-control"
+                        placeholder="P-5-InvestigateCops"
+                        name={'name'}
+                        defaultValue={''}
+                        autoFocus
+                        maxLength={25}
+                        onChange={setName}
+                      />
+                    </div>
+                  </div>
+                  <div id="input-hypgroup-description-ctn" className="form-group">
+                    <label className="col-sm-2 control-label" htmlFor="input-hypgroup-description">Description</label>
+                    <div className="col-sm-10">
+                      <input
+                        id="input-hypgroup-description"
+                        type="text"
+                        className="form-control"
+                        placeholder=""
+                        name={'name'}
+                        defaultValue={''}
+                        maxLength={250}
+                        onChange={setDescription}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <div className="col-sm-12">
+                      <button className="btn btn-primary" onClick={handleSubmit}>
+                        Create Group
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </Modal.Body>
+          </Modal>
+        </div>
+      }
 
       {isTaskArchivable() && (
         <OverlayTrigger placement="bottom" overlay={getTooltip()}>
@@ -92,4 +186,4 @@ const TaskIcons = ({ gid, subtaskGids = [], archiveTask, history, currentPursuan
   )
 }
 
-export default withRouter(connect(({currentPursuanceId}) => ({currentPursuanceId}), { archiveTask })(TaskIcons));
+export default withRouter(connect(({currentPursuanceId, hypothesis}) => ({currentPursuanceId, hypothesis}), { archiveTask, fetchHypothesisGroup, toggleHypothesisModal })(TaskIcons));

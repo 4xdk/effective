@@ -17,6 +17,7 @@ import memberships from './membershipsReducer';
 import showPopup from './showPopupReducer';
 import publicProfiles from './publicProfilesReducer';
 import taskLists from './taskListReducer';
+import hypothesis from './hypothesisModalReducer';
 
 const rootReducer = combineReducers({
   notifications: notificationsReducer,
@@ -37,6 +38,7 @@ const rootReducer = combineReducers({
   showPopup,
   publicProfiles,
   taskLists,
+  hypothesis,
 });
 
 export default rootReducer;

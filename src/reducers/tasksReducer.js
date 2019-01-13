@@ -195,6 +195,35 @@ export default function(state = initialState, action) {
       });
     }
 
+    case 'HYPOTHESIS_GROUP_CREATING': {
+      // simply set the task as in progress of creating a hypothesis group
+      const { taskGid } = action;
+      const task = state.taskMap[taskGid];
+
+      return Object.assign({}, state, {
+        taskMap: Object.assign({}, state.taskMap, {
+          [taskGid]: Object.assign({}, task, {
+            creatingHypothesisGroup: 'in progress'
+          })
+        })
+      });
+    }
+
+    case 'HYPOTHESIS_GROUP_CREATED': {
+      // assign the data returned from hypothesis call to the task
+      const { taskGid, hypothesisData } = action;
+      const task = state.taskMap[taskGid];
+
+      return Object.assign({}, state, {
+        taskMap: Object.assign({}, state.taskMap, {
+          [taskGid]: Object.assign({}, task, {
+            creatingHypothesisGroup: 'done',
+            deliverables: (task.deliverables += `* Hypothesis Group: [${hypothesisData.name}](${hypothesisData.links.html} "${hypothesisData.name}")`)
+          })
+        })
+      });
+    }
+
     default:
       return state;
   }
